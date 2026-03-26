@@ -1,0 +1,57 @@
+[build-system]
+requires = ["setuptools>=69.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pyreactor"
+version = "0.1.0"
+description = "JHipster-inspired full-stack generator for Python (FastAPI/Django/Flask) + React"
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.11"
+authors = [
+  {name = "PyReactor", email = "hello@pyreactor.dev"},
+]
+keywords = ["generator", "scaffolding", "fastapi", "react", "fullstack", "cli"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Developers",
+  "Topic :: Software Development :: Code Generators",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+]
+
+dependencies = [
+  "click>=8.1.7",
+  "rich>=13.7.0",
+  "jinja2>=3.1.4",
+]
+
+[project.scripts]
+pyreactor = "pyreactor.cli:cli"
+
+[project.urls]
+Homepage = "https://github.com/pyreactor/pyreactor"
+Repository = "https://github.com/pyreactor/pyreactor"
+Issues = "https://github.com/pyreactor/pyreactor/issues"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["pyreactor*"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "UP"]
+
+[tool.mypy]
+python_version = "3.11"
+strict = false
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
