@@ -22,7 +22,7 @@ Requires-Dist: jinja2>=3.1.4
 
 # ⚡ PyReactor
 
-> A JHipster-inspired full-stack application generator for Python + React.
+> A full-stack application generator for Python + React.
 
 PyReactor scaffolds production-ready web applications with a Python backend (FastAPI, Django, or Flask) and a React frontend — with authentication, database integration, Docker, CI/CD, and more — in under 60 seconds.
 
