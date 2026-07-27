@@ -1,25 +1,26 @@
 [build-system]
-requires = ["setuptools>=69.0", "wheel"]
+requires = ["setuptools>=77.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "pyreactor"
-version = "0.1.0"
+name = "pyreactor-cli"
+dynamic = ["version"]
 description = "JHipster-inspired full-stack generator for Python (FastAPI/Django/Flask) + React"
 readme = "README.md"
-license = {text = "MIT"}
+license = "MIT"
+license-files = ["LICENSE"]
 requires-python = ">=3.11"
 authors = [
-  {name = "PyReactor", email = "hello@pyreactor.dev"},
+  {name = "Panagiotis Adamopoulos", email = "info@assert.gr"},
 ]
 keywords = ["generator", "scaffolding", "fastapi", "react", "fullstack", "cli"]
 classifiers = [
   "Development Status :: 3 - Alpha",
   "Intended Audience :: Developers",
   "Topic :: Software Development :: Code Generators",
-  "License :: OSI Approved :: MIT License",
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
 ]
 
 dependencies = [
@@ -32,9 +33,12 @@ dependencies = [
 pyreactor = "pyreactor.cli:cli"
 
 [project.urls]
-Homepage = "https://github.com/pyreactor/pyreactor"
-Repository = "https://github.com/pyreactor/pyreactor"
-Issues = "https://github.com/pyreactor/pyreactor/issues"
+Homepage = "https://github.com/panosadamop/pyreactor"
+Repository = "https://github.com/panosadamop/pyreactor"
+Issues = "https://github.com/panosadamop/pyreactor/issues"
+
+[tool.setuptools.dynamic]
+version = {attr = "pyreactor.__version__"}
 
 [tool.setuptools.packages.find]
 where = ["."]

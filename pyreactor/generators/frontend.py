@@ -79,7 +79,7 @@ class FrontendGenerator:
     "eslint": "^8.57.0"
   }}
 }}
-''')
+''', encoding="utf-8")
 
     def _write_vite_config(self):
         (self.out / f"vite.config.{self.ext_plain}").write_text(f'''import {{ defineConfig }} from "vite";
@@ -103,7 +103,7 @@ export default defineConfig({{
     }},
   }},
 }});
-''')
+''', encoding="utf-8")
 
     def _write_tsconfig(self):
         if not self.ts:
@@ -133,7 +133,7 @@ export default defineConfig({{
   "include": ["src"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }
-''')
+''', encoding="utf-8")
         (self.out / "tsconfig.node.json").write_text('''{
   "compilerOptions": {
     "composite": true,
@@ -145,7 +145,7 @@ export default defineConfig({{
   },
   "include": ["vite.config.ts"]
 }
-''')
+''', encoding="utf-8")
 
     def _write_index_html(self):
         (self.out / "index.html").write_text(f'''<!doctype html>
@@ -161,7 +161,7 @@ export default defineConfig({{
     <script type="module" src="/src/main.{self.ext}"></script>
   </body>
 </html>
-''')
+''', encoding="utf-8")
 
     def _write_main(self):
         (self.out / "src" / f"main.{self.ext}").write_text(f'''import React from "react";
@@ -183,7 +183,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
     </QueryClientProvider>
   </React.StrictMode>
 );
-''')
+''', encoding="utf-8")
 
         (self.out / "src" / "index.css").write_text("""@tailwind base;
 @tailwind components;
@@ -194,7 +194,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
     --radius: 0.5rem;
   }
 }
-""")
+""", encoding="utf-8")
 
     def _write_app(self):
         (self.out / "src" / f"App.{self.ext}").write_text(f'''import {{ BrowserRouter, Routes, Route, Navigate }} from "react-router-dom";
@@ -229,7 +229,7 @@ export default function App() {{
     </BrowserRouter>
   );
 }}
-''')
+''', encoding="utf-8")
 
     def _write_pages(self):
         pages = self.out / "src" / "pages"
@@ -314,7 +314,7 @@ export default function LoginPage() {{
     </div>
   );
 }}
-''')
+''', encoding="utf-8")
 
         (pages / f"RegisterPage.{self.ext}").write_text(f'''import {{ useForm }} from "react-hook-form";
 import {{ zodResolver }} from "@hookform/resolvers/zod";
@@ -390,7 +390,7 @@ export default function RegisterPage() {{
     </div>
   );
 }}
-''')
+''', encoding="utf-8")
 
         (pages / f"DashboardPage.{self.ext}").write_text(f'''import {{ useCurrentUser }} from "../hooks/useCurrentUser";
 
@@ -423,7 +423,7 @@ export default function DashboardPage() {{
     </div>
   );
 }}
-''')
+''', encoding="utf-8")
 
     def _write_components(self):
         layout = self.out / "src" / "components" / "layout"
@@ -471,7 +471,7 @@ export default function Layout() {{
     </div>
   );
 }}
-''')
+''', encoding="utf-8")
 
     def _write_services(self):
         svc = self.out / "src" / "services"
@@ -508,7 +508,7 @@ api.interceptors.response.use(
 );
 
 export default api;
-''')
+''', encoding="utf-8")
 
         (svc / f"authService.{self.ext_plain}").write_text(f'''import api from "./api";
 
@@ -528,7 +528,7 @@ export const authService = {{
     return res.data;
   }},
 }};
-''')
+''', encoding="utf-8")
 
         (svc / f"userService.{self.ext_plain}").write_text(f'''import api from "./api";
 
@@ -553,7 +553,7 @@ export const userService = {{
     return res.data as User;
   }},
 }};
-''')
+''', encoding="utf-8")
 
     def _write_hooks(self):
         hooks = self.out / "src" / "hooks"
@@ -569,7 +569,7 @@ export function useCurrentUser() {{
     enabled: !!token,
   }});
 }}
-''')
+''', encoding="utf-8")
 
     def _write_store(self):
         store = self.out / "src" / "store"
@@ -592,7 +592,7 @@ export const useAuthStore = create<AuthState>()(
     {{ name: "auth-storage" }}
   )
 );
-''')
+''', encoding="utf-8")
 
     def _write_types(self):
         if not self.ts:
@@ -610,7 +610,7 @@ export interface ApiError {
   detail: string;
   status_code?: number;
 }
-''')
+''', encoding="utf-8")
 
     def _write_utils(self):
         (self.out / "src" / "utils" / f"cn.{self.ext_plain}").write_text(f'''import {{ clsx, type ClassValue }} from "clsx";
@@ -619,12 +619,12 @@ import {{ twMerge }} from "tailwind-merge";
 export function cn(...inputs: ClassValue[]) {{
   return twMerge(clsx(inputs));
 }}
-''')
+''', encoding="utf-8")
 
     def _write_env(self):
         (self.out / ".env.example").write_text("""VITE_APP_NAME=MyApp
 VITE_API_BASE_URL=http://localhost:8000
-""")
+""", encoding="utf-8")
 
         (self.out / "tailwind.config.js").write_text("""/** @type {import('tailwindcss').Config} */
 export default {
@@ -632,9 +632,9 @@ export default {
   theme: { extend: {} },
   plugins: [],
 };
-""")
+""", encoding="utf-8")
 
         (self.out / "postcss.config.js").write_text("""export default {
   plugins: { tailwindcss: {}, autoprefixer: {} },
 };
-""")
+""", encoding="utf-8")

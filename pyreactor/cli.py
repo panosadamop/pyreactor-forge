@@ -7,15 +7,32 @@ from rich.console import Console
 from rich.panel import Panel
 from rich.text import Text
 
+from pyreactor import __version__
 from pyreactor.generators.app import AppGenerator
 from pyreactor.generators.entity import EntityGenerator
 from pyreactor.utils.display import print_banner, print_success, print_error
+
+
+def _force_utf8_stdio():
+    """Windows defaults stdio to the legacy ANSI code page (cp1252 on most
+    installs), which cannot encode the Unicode we print. It only bites when
+    output is redirected -- a bare terminal goes through WriteConsoleW and
+    works fine -- so piping to a file or running under CI would otherwise
+    crash with UnicodeEncodeError.
+    """
+    for stream in (sys.stdout, sys.stderr):
+        reconfigure = getattr(stream, "reconfigure", None)
+        if reconfigure is not None:
+            reconfigure(encoding="utf-8", errors="replace")
+
+
+_force_utf8_stdio()
 
 console = Console()
 
 
 @click.group()
-@click.version_option(version="0.1.0", prog_name="PyReactor")
+@click.version_option(version=__version__, prog_name="PyReactor")
 def cli():
     """
     \b
@@ -149,7 +166,7 @@ def entity(name, app_dir):
         sys.exit(1)
 
     import json
-    with open(config_file) as f:
+    with open(config_file, encoding="utf-8") as f:
         app_config = json.load(f)
 
     console.print(f"\n[bold cyan]⚡ Adding entity:[/bold cyan] [yellow]{name}[/yellow]\n")

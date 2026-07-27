@@ -93,18 +93,18 @@ class AppGenerator:
             "auth": self.config["auth"],
             "version": "0.1.0",
         }
-        with open(self.output_dir / ".pyreactor.json", "w") as f:
+        with open(self.output_dir / ".pyreactor.json", "w", encoding="utf-8") as f:
             json.dump(meta, f, indent=2)
 
         # Root README
         readme = self._render_readme()
-        (self.output_dir / "README.md").write_text(readme)
+        (self.output_dir / "README.md").write_text(readme, encoding="utf-8")
 
         # Root .gitignore
-        (self.output_dir / ".gitignore").write_text(ROOT_GITIGNORE)
+        (self.output_dir / ".gitignore").write_text(ROOT_GITIGNORE, encoding="utf-8")
 
         # Makefile
-        (self.output_dir / "Makefile").write_text(self._render_makefile())
+        (self.output_dir / "Makefile").write_text(self._render_makefile(), encoding="utf-8")
 
     def _render_readme(self):
         name = self.name

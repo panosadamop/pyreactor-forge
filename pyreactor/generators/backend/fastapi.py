@@ -68,13 +68,13 @@ app.add_middleware(
 app.include_router(health.router, tags=["health"])
 app.include_router(auth.router, prefix="/api/auth", tags=["auth"])
 app.include_router(users.router, prefix="/api/users", tags=["users"])
-''')
+''', encoding="utf-8")
 
-        (self.out / "app" / "__init__.py").write_text("")
+        (self.out / "app" / "__init__.py").write_text("", encoding="utf-8")
 
     def _write_core(self):
         core = self.out / "app" / "core"
-        (core / "__init__.py").write_text("")
+        (core / "__init__.py").write_text("", encoding="utf-8")
 
         # config.py
         (core / "config.py").write_text('''"""Application configuration."""
@@ -100,7 +100,7 @@ class Settings(BaseSettings):
 
 
 settings = Settings()
-''')
+''', encoding="utf-8")
 
         # database.py
         db_url = {
@@ -149,7 +149,7 @@ async def create_tables():
     async with engine.begin() as conn:
         from app.models import user  # noqa: F401 - registers models
         await conn.run_sync(Base.metadata.create_all)
-''')
+''', encoding="utf-8")
 
         # security.py
         (core / "security.py").write_text('''"""Security utilities: password hashing, JWT tokens."""
@@ -188,7 +188,7 @@ def decode_token(token: str) -> dict:
             detail="Invalid or expired token",
             headers={"WWW-Authenticate": "Bearer"},
         )
-''')
+''', encoding="utf-8")
 
         # deps.py
         (core / "deps.py").write_text('''"""FastAPI dependency injections."""
@@ -229,11 +229,11 @@ async def get_current_active_superuser(
     if not current_user.is_superuser:
         raise HTTPException(status_code=403, detail="Not enough permissions")
     return current_user
-''')
+''', encoding="utf-8")
 
     def _write_models(self):
         models = self.out / "app" / "models"
-        (models / "__init__.py").write_text("")
+        (models / "__init__.py").write_text("", encoding="utf-8")
         (models / "user.py").write_text('''"""User database model."""
 
 from datetime import datetime, timezone
@@ -263,11 +263,11 @@ class User(Base):
 
     def __repr__(self) -> str:
         return f"<User id={self.id} email={self.email}>"
-''')
+''', encoding="utf-8")
 
     def _write_schemas(self):
         schemas = self.out / "app" / "schemas"
-        (schemas / "__init__.py").write_text("")
+        (schemas / "__init__.py").write_text("", encoding="utf-8")
         (schemas / "user.py").write_text('''"""User Pydantic schemas."""
 
 from datetime import datetime
@@ -319,7 +319,7 @@ class UserList(BaseModel):
     total: int
     page: int
     size: int
-''')
+''', encoding="utf-8")
 
         (schemas / "auth.py").write_text('''"""Auth Pydantic schemas."""
 
@@ -342,11 +342,11 @@ class RegisterRequest(BaseModel):
     username: str
     password: str
     full_name: str | None = None
-''')
+''', encoding="utf-8")
 
     def _write_routers(self):
         routers = self.out / "app" / "routers"
-        (routers / "__init__.py").write_text("")
+        (routers / "__init__.py").write_text("", encoding="utf-8")
 
         (routers / "health.py").write_text('''"""Health check router."""
 
@@ -359,7 +359,7 @@ router = APIRouter()
 @router.get("/health")
 async def health_check():
     return {"status": "ok", "timestamp": datetime.now(timezone.utc).isoformat()}
-''')
+''', encoding="utf-8")
 
         (routers / "auth.py").write_text('''"""Authentication router."""
 
@@ -414,7 +414,7 @@ async def login(data: LoginRequest, db: AsyncSession = Depends(get_db)):
         access_token=token,
         expires_in=settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60,
     )
-''')
+''', encoding="utf-8")
 
         (routers / "users.py").write_text('''"""Users router."""
 
@@ -469,11 +469,11 @@ async def get_user(user_id: int, db: AsyncSession = Depends(get_db)):
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
     return user
-''')
+''', encoding="utf-8")
 
     def _write_services(self):
         svc = self.out / "app" / "services"
-        (svc / "__init__.py").write_text("")
+        (svc / "__init__.py").write_text("", encoding="utf-8")
         (svc / "user_service.py").write_text('''"""User service layer."""
 
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -505,11 +505,11 @@ class UserService:
         await self.db.commit()
         await self.db.refresh(user)
         return user
-''')
+''', encoding="utf-8")
 
     def _write_tests(self):
         tests = self.out / "tests"
-        (tests / "__init__.py").write_text("")
+        (tests / "__init__.py").write_text("", encoding="utf-8")
         (tests / "conftest.py").write_text('''"""Test configuration and fixtures."""
 
 import pytest
@@ -547,7 +547,7 @@ async def client(db):
     async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as ac:
         yield ac
     app.dependency_overrides.clear()
-''')
+''', encoding="utf-8")
 
         (tests / "test_auth.py").write_text('''"""Auth endpoint tests."""
 
@@ -596,7 +596,7 @@ async def test_login_wrong_password(client):
         "password": "wrongpassword",
     })
     assert response.status_code == 401
-''')
+''', encoding="utf-8")
 
     def _write_config_files(self):
         # requirements.txt
@@ -621,7 +621,7 @@ pytest-asyncio>=0.23.0
 mypy>=1.10.0
 ruff>=0.4.0
 {db_drivers}
-""")
+""", encoding="utf-8")
 
         # .env.example
         db_url = {
@@ -639,7 +639,7 @@ ACCESS_TOKEN_EXPIRE_MINUTES=30
 
 DATABASE_URL={db_url}
 ALLOWED_ORIGINS=["http://localhost:5173","http://localhost:3000"]
-""")
+""", encoding="utf-8")
 
         # pyproject.toml
         (self.out / "pyproject.toml").write_text(f"""[tool.pytest.ini_options]
@@ -657,7 +657,7 @@ select = ["E", "F", "I", "N", "UP"]
 python_version = "3.11"
 strict = false
 ignore_missing_imports = true
-""")
+""", encoding="utf-8")
 
         # alembic.ini skeleton
         (self.out / "alembic.ini").write_text(f"""[alembic]
@@ -697,4 +697,4 @@ formatter = generic
 [formatter_generic]
 format = %(levelname)-5.5s [%(name)s] %(message)s
 datefmt = %H:%M:%S
-""")
+""", encoding="utf-8")

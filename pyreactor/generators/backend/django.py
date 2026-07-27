@@ -42,7 +42,7 @@ def main():
 
 if __name__ == "__main__":
     main()
-''')
+''', encoding="utf-8")
 
     def _write_settings(self):
         db_engine = {
@@ -51,7 +51,7 @@ if __name__ == "__main__":
             "sqlite": "django.db.backends.sqlite3",
         }[self.db]
 
-        (self.out / self.slug / "__init__.py").write_text("")
+        (self.out / self.slug / "__init__.py").write_text("", encoding="utf-8")
         (self.out / self.slug / "settings.py").write_text(f'''"""Django settings for {self.name}."""
 
 from pathlib import Path
@@ -122,7 +122,7 @@ CORS_ALLOWED_ORIGINS = [
 
 STATIC_URL = "/static/"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
-''')
+''', encoding="utf-8")
 
         (self.out / self.slug / "urls.py").write_text(f'''"""URL configuration for {self.name}."""
 
@@ -136,11 +136,11 @@ urlpatterns = [
     path("api/auth/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
     path("api/", include("api.v1.urls")),
 ]
-''')
+''', encoding="utf-8")
 
     def _write_app(self):
-        (self.out / "api" / "__init__.py").write_text("")
-        (self.out / "api" / "v1" / "__init__.py").write_text("")
+        (self.out / "api" / "__init__.py").write_text("", encoding="utf-8")
+        (self.out / "api" / "v1" / "__init__.py").write_text("", encoding="utf-8")
         (self.out / "api" / "v1" / "urls.py").write_text('''from django.urls import path
 from . import views
 
@@ -148,7 +148,7 @@ urlpatterns = [
     path("users/me/", views.MeView.as_view(), name="me"),
     path("health/", views.HealthView.as_view(), name="health"),
 ]
-''')
+''', encoding="utf-8")
         (self.out / "api" / "v1" / "views.py").write_text('''"""API Views."""
 
 from rest_framework.views import APIView
@@ -176,7 +176,7 @@ class HealthView(APIView):
 
     def get(self, request):
         return Response({"status": "ok"})
-''')
+''', encoding="utf-8")
 
     def _write_requirements(self):
         db_pkg = {
@@ -193,7 +193,7 @@ python-decouple>=3.8
 {db_pkg}
 pytest-django>=4.8.0
 ruff>=0.4.0
-""")
+""", encoding="utf-8")
 
     def _write_env(self):
         (self.out / ".env.example").write_text(f"""DEBUG=True
@@ -203,4 +203,4 @@ DB_USER=postgres
 DB_PASSWORD=postgres
 DB_HOST=localhost
 DB_PORT=5432
-""")
+""", encoding="utf-8")

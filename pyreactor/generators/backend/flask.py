@@ -50,7 +50,7 @@ def create_app(config=Config) -> Flask:
         db.create_all()
 
     return app
-''')
+''', encoding="utf-8")
 
         (self.out / "app" / "config.py").write_text(f'''"""Flask configuration."""
 
@@ -73,7 +73,7 @@ class DevelopmentConfig(Config):
 
 class ProductionConfig(Config):
     DEBUG = False
-''')
+''', encoding="utf-8")
 
         (self.out / "wsgi.py").write_text('''"""WSGI entry point."""
 
@@ -83,7 +83,7 @@ app = create_app()
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8000)
-''')
+''', encoding="utf-8")
 
     def _write_models(self):
         (self.out / "app" / "models.py").write_text('''"""Database models."""
@@ -120,7 +120,7 @@ class User(db.Model):
             "is_active": self.is_active,
             "created_at": self.created_at.isoformat(),
         }
-''')
+''', encoding="utf-8")
 
     def _write_routes(self):
         (self.out / "app" / "routes.py").write_text('''"""Flask route blueprints."""
@@ -168,7 +168,7 @@ def me():
     user_id = get_jwt_identity()
     user = User.query.get_or_404(int(user_id))
     return jsonify(user.to_dict())
-''')
+''', encoding="utf-8")
 
     def _write_requirements(self):
         (self.out / "requirements.txt").write_text("""Flask>=3.0.0
@@ -180,11 +180,11 @@ python-decouple>=3.8
 pytest>=8.2.0
 pytest-flask>=1.3.0
 ruff>=0.4.0
-""")
+""", encoding="utf-8")
 
     def _write_env(self):
         (self.out / ".env.example").write_text("""SECRET_KEY=your-secret-key-here
 JWT_SECRET_KEY=your-jwt-key-here
 DATABASE_URL=sqlite:///./app.db
 DEBUG=True
-""")
+""", encoding="utf-8")

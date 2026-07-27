@@ -24,13 +24,17 @@ PyReactor scaffolds production-ready web applications with a Python backend (Fas
 ## 📦 Installation
 
 ```bash
-pip install pyreactor
+pip install pyreactor-cli
 ```
+
+> The PyPI distribution is named **`pyreactor-cli`** (the name `pyreactor` was already
+> taken by an unrelated package). The command and the import package are both
+> `pyreactor` — only the install name differs.
 
 Or from source:
 
 ```bash
-git clone https://github.com/pyreactor/pyreactor
+git clone https://github.com/panosadamop/pyreactor
 cd pyreactor
 pip install -e .
 ```
@@ -232,4 +236,4 @@ my-saas/
 
 ## 📄 License
 
-MIT © PyReactor
+MIT © Panagiotis Adamopoulos

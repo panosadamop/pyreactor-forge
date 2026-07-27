@@ -100,7 +100,7 @@ class {self.name}(Base):
 
     def __repr__(self) -> str:
         return f"<{self.name} id={{self.id}}>"
-''')
+''', encoding="utf-8")
         self.created_files.append(str(model_path.relative_to(self.app_dir)))
 
     def _fastapi_schema(self):
@@ -136,7 +136,7 @@ class {self.name}Update(BaseModel):
 class {self.name}Read({self.name}Base):
     id: int
     model_config = {{"from_attributes": True}}
-''')
+''', encoding="utf-8")
         self.created_files.append(str(schema_path.relative_to(self.app_dir)))
 
     def _fastapi_router(self):
@@ -223,14 +223,14 @@ async def delete_{self.slug}(
         raise HTTPException(status_code=404, detail="{self.name} not found")
     await db.delete(obj)
     await db.commit()
-''')
+''', encoding="utf-8")
         self.created_files.append(str(router_path.relative_to(self.app_dir)))
 
     def _register_fastapi_router(self):
         main_path = self.app_dir / "backend" / "app" / "main.py"
         if not main_path.exists():
             return
-        content = main_path.read_text()
+        content = main_path.read_text(encoding="utf-8")
         import_line = f"from app.routers import {self.slug_plural}"
         register_line = (
             f'app.include_router({self.slug_plural}.router, '
@@ -249,7 +249,7 @@ async def delete_{self.slug}(
         if register_line not in content:
             content += f"\n{register_line}\n"
 
-        main_path.write_text(content)
+        main_path.write_text(content, encoding="utf-8")
         self.created_files.append("backend/app/main.py (updated)")
 
     # ─────────────────────────────────────────────
@@ -276,7 +276,7 @@ class {self.name}(models.Model):
 
     def __str__(self):
         return f"{self.name} #{{self.pk}}"
-''')
+''', encoding="utf-8")
         self.created_files.append(str(out.relative_to(self.app_dir)))
 
     def _django_serializer(self):
@@ -289,7 +289,7 @@ class {self.name}Serializer(serializers.ModelSerializer):
     class Meta:
         model = {self.name}
         fields = "__all__"
-''')
+''', encoding="utf-8")
         self.created_files.append(str(out.relative_to(self.app_dir)))
 
     def _django_view(self):
@@ -302,7 +302,7 @@ from .serializers_{self.slug} import {self.name}Serializer
 class {self.name}ViewSet(ModelViewSet):
     queryset = {self.name}.objects.all()
     serializer_class = {self.name}Serializer
-''')
+''', encoding="utf-8")
         self.created_files.append(str(out.relative_to(self.app_dir)))
 
     # ─────────────────────────────────────────────
@@ -322,7 +322,7 @@ class {self.name}(db.Model):
     __tablename__ = "{self.slug_plural}"
     id = db.Column(db.Integer, primary_key=True)
 {cols}
-''')
+''', encoding="utf-8")
         self.created_files.append(str(out.relative_to(self.app_dir)))
 
     def _flask_routes(self):
@@ -350,7 +350,7 @@ def create_{self.slug}():
     db.session.add(obj)
     db.session.commit()
     return jsonify({{"id": obj.id}}), 201
-''')
+''', encoding="utf-8")
         self.created_files.append(str(out.relative_to(self.app_dir)))
 
     # ─────────────────────────────────────────────
@@ -399,7 +399,7 @@ export const {self.slug}Service = {{
     await api.delete(`/{self.slug_plural}/${{id}}`);
   }},
 }};
-''')
+''', encoding="utf-8")
         self.created_files.append(str(svc_path.relative_to(self.app_dir)))
 
     def _frontend_page(self):
@@ -472,14 +472,14 @@ export default function {self.name}Page() {{
     </div>
   );
 }}
-''')
+''', encoding="utf-8")
         self.created_files.append(str(page_path.relative_to(self.app_dir)))
 
     def _register_frontend_route(self):
         app_path = self.app_dir / "frontend" / "src" / f"App.{self.ext}"
         if not app_path.exists():
             return
-        content = app_path.read_text()
+        content = app_path.read_text(encoding="utf-8")
         import_line = f'import {self.name}Page from "./pages/{self.name}Page";'
         route_line = f'          <Route path="/{self.slug_plural}" element={{<{self.name}Page />}} />'
 
@@ -490,5 +490,5 @@ export default function {self.name}Page() {{
                 '          <Route index element={<DashboardPage />} />',
                 f'          <Route index element={{<DashboardPage />}} />\n{route_line}'
             )
-        app_path.write_text(content)
+        app_path.write_text(content, encoding="utf-8")
         self.created_files.append("frontend/src/App.tsx (updated)")

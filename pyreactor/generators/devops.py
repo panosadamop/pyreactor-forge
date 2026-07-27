@@ -53,7 +53,7 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \\
   CMD curl -f http://localhost:8000/health || exit 1
 
 CMD ["/bin/sh", "-c", "{run_cmd}"]
-""")
+""", encoding="utf-8")
 
     def _write_docker_frontend(self):
         (self.out / "frontend" / "Dockerfile").write_text("""# Build stage
@@ -70,7 +70,7 @@ COPY --from=build /app/dist /usr/share/nginx/html
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]
-""")
+""", encoding="utf-8")
 
         (self.out / "frontend" / "nginx.conf").write_text("""server {
     listen 80;
@@ -88,7 +88,7 @@ CMD ["nginx", "-g", "daemon off;"]
         proxy_set_header X-Real-IP $remote_addr;
     }
 }
-""")
+""", encoding="utf-8")
 
     def _write_compose(self):
         db_service = self._db_service()
@@ -135,7 +135,7 @@ networks:
 
 volumes:
   db-data:
-""")
+""", encoding="utf-8")
 
         (self.out / "docker-compose.dev.yml").write_text(f"""version: "3.9"
 
@@ -156,7 +156,7 @@ services:
     volumes:
       - ./frontend:/app
       - /app/node_modules
-""")
+""", encoding="utf-8")
 
     def _db_service(self):
         if self.db == "postgresql":
@@ -295,7 +295,7 @@ jobs:
           sleep 15
           curl -f http://localhost:8000/health || exit 1
           docker-compose down
-""")
+""", encoding="utf-8")
 
         (ci_dir / "release.yml").write_text(f"""name: Release
 
@@ -331,7 +331,7 @@ jobs:
           context: ./frontend
           push: true
           tags: ${{{{ secrets.DOCKER_USERNAME }}}}/{self.slug}-frontend:${{{{ github.ref_name }}}}
-""")
+""", encoding="utf-8")
 
     def _write_gitlab_ci(self):
         (self.out / ".gitlab-ci.yml").write_text("""stages:
@@ -373,4 +373,4 @@ docker-build:
     - main
   script:
     - docker-compose build
-""")
+""", encoding="utf-8")
