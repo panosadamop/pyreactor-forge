@@ -1,0 +1,128 @@
+name: Release
+
+# Publishing uses PyPI Trusted Publishing (OIDC) -- no API tokens are stored
+# anywhere in this repo. The `id-token: write` permission on the publish jobs
+# lets GitHub mint a short-lived identity token that PyPI exchanges for a
+# one-time upload credential.
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      target:
+        description: "Index to publish to"
+        type: choice
+        options:
+          - testpypi
+          - pypi
+        default: testpypi
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: test (${{ matrix.os }}, py${{ matrix.python-version }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        python-version: ["3.11", "3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - run: python -m pip install --upgrade pip
+      - run: pip install -e ".[dev]"
+
+      - run: pytest -q
+
+      # Both encoding bugs this project has hit were invisible from a terminal
+      # and only appeared once stdout was a pipe, so redirect on purpose here.
+      # Windows runners default to cp1252, which is exactly the failing case.
+      - name: Smoke test CLI with redirected stdout
+        shell: bash
+        run: |
+          set -euo pipefail
+          pyreactor --version > cli.log 2>&1
+          pyreactor new -n smoke -b fastapi -f react-ts -d sqlite -a jwt \
+            -o "$RUNNER_TEMP" --docker --ci github-actions >> cli.log 2>&1
+          cat cli.log
+          test -f "$RUNNER_TEMP/smoke/backend/app/main.py"
+
+  build:
+    name: build distributions
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      # A release tag that disagrees with pyreactor.__version__ would publish
+      # the wrong version under the right tag, and the number can never be
+      # reused. Fail before anything is built.
+      - name: Check tag matches package version
+        if: github.event_name == 'release'
+        run: |
+          set -euo pipefail
+          pkg="$(python -c 'import pyreactor; print(pyreactor.__version__)')"
+          tag="${GITHUB_REF_NAME#v}"
+          echo "package=$pkg tag=$tag"
+          if [ "$pkg" != "$tag" ]; then
+            echo "::error::Tag $GITHUB_REF_NAME does not match __version__ $pkg"
+            exit 1
+          fi
+
+      - run: pipx run build
+      - run: pipx run twine check --strict dist/*
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+  publish-testpypi:
+    name: publish to TestPyPI
+    needs: build
+    if: github.event_name == 'workflow_dispatch' && inputs.target == 'testpypi'
+    runs-on: ubuntu-latest
+    environment:
+      name: testpypi
+      url: https://test.pypi.org/p/pyreactor-cli
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+      - uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          repository-url: https://test.pypi.org/legacy/
+
+  publish-pypi:
+    name: publish to PyPI
+    needs: build
+    if: >-
+      github.event_name == 'release' ||
+      (github.event_name == 'workflow_dispatch' && inputs.target == 'pypi')
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/p/pyreactor-cli
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+      - uses: pypa/gh-action-pypi-publish@release/v1

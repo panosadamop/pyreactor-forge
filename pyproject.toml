@@ -29,6 +29,13 @@ dependencies = [
   "jinja2>=3.1.4",
 ]
 
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.0",
+  "ruff>=0.6",
+  "mypy>=1.11",
+]
+
 [project.scripts]
 pyreactor = "pyreactor.cli:cli"
 
@@ -58,4 +65,3 @@ ignore_missing_imports = true
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-asyncio_mode = "auto"
