@@ -49,8 +49,8 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          pyreactor --version > cli.log 2>&1
-          pyreactor new -n smoke -b fastapi -f react-ts -d sqlite -a jwt \
+          pyforge --version > cli.log 2>&1
+          pyforge new -n smoke -b fastapi -f react-ts -d sqlite -a jwt \
             -o "$RUNNER_TEMP" --docker --ci github-actions >> cli.log 2>&1
           cat cli.log
           test -f "$RUNNER_TEMP/smoke/backend/app/main.py"
@@ -66,14 +66,14 @@ jobs:
         with:
           python-version: "3.12"
 
-      # A release tag that disagrees with pyreactor.__version__ would publish
+      # A release tag that disagrees with pyreactor_forge.__version__ would publish
       # the wrong version under the right tag, and the number can never be
       # reused. Fail before anything is built.
       - name: Check tag matches package version
         if: github.event_name == 'release'
         run: |
           set -euo pipefail
-          pkg="$(python -c 'import pyreactor; print(pyreactor.__version__)')"
+          pkg="$(python -c 'import pyreactor_forge; print(pyreactor_forge.__version__)')"
           tag="${GITHUB_REF_NAME#v}"
           echo "package=$pkg tag=$tag"
           if [ "$pkg" != "$tag" ]; then
@@ -96,7 +96,7 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: testpypi
-      url: https://test.pypi.org/p/pyreactor-cli
+      url: https://test.pypi.org/p/pyreactor-forge
     permissions:
       id-token: write
     steps:
@@ -117,7 +117,7 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: pypi
-      url: https://pypi.org/p/pyreactor-cli
+      url: https://pypi.org/p/pyreactor-forge
     permissions:
       id-token: write
     steps:

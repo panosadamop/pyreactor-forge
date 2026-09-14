@@ -1,4 +1,4 @@
-"""PyReactor CLI - JHipster-inspired full-stack generator for Python + React."""
+"""PyReactor Forge CLI - JHipster-inspired full-stack generator for Python + React."""
 
 import click
 import sys
@@ -7,10 +7,10 @@ from rich.console import Console
 from rich.panel import Panel
 from rich.text import Text
 
-from pyreactor import __version__
-from pyreactor.generators.app import AppGenerator
-from pyreactor.generators.entity import EntityGenerator
-from pyreactor.utils.display import print_banner, print_success, print_error
+from pyreactor_forge import __version__
+from pyreactor_forge.generators.app import AppGenerator
+from pyreactor_forge.generators.entity import EntityGenerator
+from pyreactor_forge.utils.display import print_banner, print_success, print_error
 
 
 def _force_utf8_stdio():
@@ -32,7 +32,7 @@ console = Console()
 
 
 @click.group()
-@click.version_option(version=__version__, prog_name="PyReactor")
+@click.version_option(version=__version__, prog_name="PyReactor Forge")
 def cli():
     """
     \b
@@ -131,7 +131,7 @@ def new(name, backend, frontend, database, auth, output_dir, docker, ci):
             f"  Auth:     [green]{auth}[/green]\n"
             f"  Docker:   [green]{'yes' if docker else 'no'}[/green]\n"
             f"  CI/CD:    [green]{ci}[/green]",
-            title="⚡ PyReactor",
+            title="⚡ PyReactor Forge",
             border_style="cyan",
         )
     )
@@ -156,12 +156,12 @@ def new(name, backend, frontend, database, auth, output_dir, docker, ci):
 def entity(name, app_dir):
     """Add a new entity (model + API + UI) to an existing app."""
     app_path = Path(app_dir)
-    config_file = app_path / ".pyreactor.json"
+    config_file = app_path / ".pyforge.json"
 
     if not config_file.exists():
         console.print(
-            "[red]Error:[/red] No .pyreactor.json found. "
-            "Run this command inside a PyReactor-generated project."
+            "[red]Error:[/red] No .pyforge.json found. "
+            "Run this command inside a PyReactor Forge-generated project."
         )
         sys.exit(1)
 
@@ -204,11 +204,11 @@ def entity(name, app_dir):
 
 @cli.command()
 def info():
-    """Display information about the PyReactor generator."""
+    """Display information about the PyReactor Forge generator."""
     print_banner()
     console.print(
         Panel(
-            "[bold]PyReactor[/bold] is a full-stack code generator inspired by JHipster.\n\n"
+            "[bold]PyReactor Forge[/bold] is a full-stack code generator inspired by JHipster.\n\n"
             "[bold cyan]Supported backends:[/bold cyan]\n"
             "  • [green]FastAPI[/green]  — Modern, fast async Python API framework\n"
             "  • [green]Django[/green]   — Batteries-included Python web framework\n"
@@ -221,10 +221,10 @@ def info():
             "[bold cyan]Supported authentication:[/bold cyan]\n"
             "  • [green]JWT[/green] • [green]Session[/green] • [green]OAuth2[/green]\n\n"
             "[bold cyan]Commands:[/bold cyan]\n"
-            "  • [yellow]pyreactor new[/yellow]     — Scaffold a new application\n"
-            "  • [yellow]pyreactor entity[/yellow]  — Add a new entity to an existing app\n"
-            "  • [yellow]pyreactor info[/yellow]    — Show this information",
-            title="ℹ️  About PyReactor",
+            "  • [yellow]pyforge new[/yellow]     — Scaffold a new application\n"
+            "  • [yellow]pyforge entity[/yellow]  — Add a new entity to an existing app\n"
+            "  • [yellow]pyforge info[/yellow]    — Show this information",
+            title="ℹ️  About PyReactor Forge",
             border_style="blue",
         )
     )

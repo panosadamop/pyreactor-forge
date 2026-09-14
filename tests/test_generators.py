@@ -1,4 +1,4 @@
-"""Tests for PyReactor generators."""
+"""Tests for PyReactor Forge generators."""
 
 import json
 import shutil
@@ -8,8 +8,8 @@ from pathlib import Path
 import pytest
 from click.testing import CliRunner
 
-from pyreactor.cli import cli
-from pyreactor.generators.app import AppGenerator
+from pyreactor_forge.cli import cli
+from pyreactor_forge.generators.app import AppGenerator
 
 
 @pytest.fixture
@@ -40,15 +40,15 @@ class TestAppGenerator:
         assert project.exists()
         assert (project / "backend").exists()
         assert (project / "frontend").exists()
-        assert (project / ".pyreactor.json").exists()
+        assert (project / ".pyforge.json").exists()
         assert (project / "README.md").exists()
         assert (project / "Makefile").exists()
 
-    def test_pyreactor_json_content(self, temp_dir):
+    def test_pyforge_json_content(self, temp_dir):
         config = {**BASE_CONFIG, "output_dir": str(temp_dir)}
         AppGenerator(config).generate()
 
-        meta_path = temp_dir / "test-app" / ".pyreactor.json"
+        meta_path = temp_dir / "test-app" / ".pyforge.json"
         with open(meta_path) as f:
             meta = json.load(f)
 
@@ -129,10 +129,10 @@ class TestEntityGenerator:
         return temp_dir / "test-app"
 
     def test_entity_generates_files(self, temp_dir):
-        from pyreactor.generators.entity import EntityGenerator
+        from pyreactor_forge.generators.entity import EntityGenerator
 
         project = self._generate_base_app(temp_dir)
-        with open(project / ".pyreactor.json") as f:
+        with open(project / ".pyforge.json") as f:
             app_config = json.load(f)
 
         fields = [
@@ -150,10 +150,10 @@ class TestEntityGenerator:
         assert (project / "frontend" / "src" / "pages" / "ProductPage.tsx").exists()
 
     def test_entity_router_has_crud(self, temp_dir):
-        from pyreactor.generators.entity import EntityGenerator
+        from pyreactor_forge.generators.entity import EntityGenerator
 
         project = self._generate_base_app(temp_dir)
-        with open(project / ".pyreactor.json") as f:
+        with open(project / ".pyforge.json") as f:
             app_config = json.load(f)
 
         fields = [{"name": "name", "type": "string", "required": True}]
@@ -172,7 +172,7 @@ class TestCLI:
         runner = CliRunner()
         result = runner.invoke(cli, ["--help"])
         assert result.exit_code == 0
-        assert "PyReactor" in result.output
+        assert "PyReactor Forge" in result.output
 
     def test_info_command(self):
         runner = CliRunner()

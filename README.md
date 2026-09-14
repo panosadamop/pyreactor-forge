@@ -1,8 +1,8 @@
-# ⚡ PyReactor
+# ⚡ PyReactor Forge
 
 > A full-stack application generator for Python + React.
 
-PyReactor scaffolds production-ready web applications with a Python backend (FastAPI, Django, or Flask) and a React frontend — with authentication, database integration, Docker, CI/CD, and more — in under 60 seconds.
+PyReactor Forge scaffolds production-ready web applications with a Python backend (FastAPI, Django, or Flask) and a React frontend — with authentication, database integration, Docker, CI/CD, and more — in under 60 seconds.
 
 ---
 
@@ -24,18 +24,17 @@ PyReactor scaffolds production-ready web applications with a Python backend (Fas
 ## 📦 Installation
 
 ```bash
-pip install pyreactor-cli
+pip install pyreactor-forge
 ```
 
-> The PyPI distribution is named **`pyreactor-cli`** (the name `pyreactor` was already
-> taken by an unrelated package). The command and the import package are both
-> `pyreactor` — only the install name differs.
+> Installs as **`pyreactor-forge`**. The terminal command is **`pyforge`** and the
+> import package is `pyreactor_forge`.
 
 Or from source:
 
 ```bash
-git clone https://github.com/panosadamop/pyreactor
-cd pyreactor
+git clone https://github.com/panosadamop/pyreactor-forge
+cd pyreactor-forge
 pip install -e .
 ```
 
@@ -46,7 +45,7 @@ pip install -e .
 ### 1. Generate a new application
 
 ```bash
-pyreactor new
+pyforge new
 ```
 
 You'll be prompted to configure your app:
@@ -64,7 +63,7 @@ CI/CD pipeline: github-actions
 Or pass everything as flags:
 
 ```bash
-pyreactor new \
+pyforge new \
   --name my-saas \
   --backend fastapi \
   --frontend react-ts \
@@ -105,7 +104,7 @@ Visit:
 
 ```bash
 cd my-saas
-pyreactor entity
+pyforge entity
 ```
 
 ```
@@ -169,7 +168,7 @@ my-saas/
 ├── docker-compose.yml
 ├── docker-compose.dev.yml
 ├── Makefile
-├── .pyreactor.json             # Project metadata
+├── .pyforge.json             # Project metadata
 └── README.md
 ```
 
@@ -179,10 +178,10 @@ my-saas/
 
 | Command | Description |
 |---|---|
-| `pyreactor new` | Scaffold a new full-stack application |
-| `pyreactor entity` | Add a new entity (model + API + UI) to an existing app |
-| `pyreactor info` | Show supported technologies and commands |
-| `pyreactor --version` | Display the PyReactor version |
+| `pyforge new` | Scaffold a new full-stack application |
+| `pyforge entity` | Add a new entity (model + API + UI) to an existing app |
+| `pyforge info` | Show supported technologies and commands |
+| `pyforge --version` | Display the PyReactor Forge version |
 
 ### Makefile targets (inside generated project)
 

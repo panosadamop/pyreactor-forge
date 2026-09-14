@@ -1,4 +1,4 @@
-"""Display utilities for PyReactor CLI."""
+"""Display utilities for PyReactor Forge CLI."""
 
 from rich.console import Console
 from rich.panel import Panel
@@ -10,7 +10,7 @@ console = Console()
 def print_banner():
     console.print()
     console.print(
-        "[bold cyan]⚡ PyReactor[/bold cyan] [dim]— Full-stack Python + React Generator[/dim]"
+        "[bold cyan]⚡ PyReactor Forge[/bold cyan] [dim]— Full-stack Python + React Generator[/dim]"
     )
     console.print()
 
@@ -47,7 +47,7 @@ def print_success(name: str, config: dict):
     )
     console.print()
     console.print(
-        "[dim]Tip: Add entities with [/dim][cyan]pyreactor entity[/cyan][dim] inside your project.[/dim]"
+        "[dim]Tip: Add entities with [/dim][cyan]pyforge entity[/cyan][dim] inside your project.[/dim]"
     )
     console.print()
 

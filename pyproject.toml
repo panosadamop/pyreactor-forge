@@ -3,7 +3,7 @@ requires = ["setuptools>=77.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "pyreactor-cli"
+name = "pyreactor-forge"
 dynamic = ["version"]
 description = "JHipster-inspired full-stack generator for Python (FastAPI/Django/Flask) + React"
 readme = "README.md"
@@ -37,19 +37,19 @@ dev = [
 ]
 
 [project.scripts]
-pyreactor = "pyreactor.cli:cli"
+pyforge = "pyreactor_forge.cli:cli"
 
 [project.urls]
-Homepage = "https://github.com/panosadamop/pyreactor"
-Repository = "https://github.com/panosadamop/pyreactor"
-Issues = "https://github.com/panosadamop/pyreactor/issues"
+Homepage = "https://github.com/panosadamop/pyreactor-forge"
+Repository = "https://github.com/panosadamop/pyreactor-forge"
+Issues = "https://github.com/panosadamop/pyreactor-forge/issues"
 
 [tool.setuptools.dynamic]
-version = {attr = "pyreactor.__version__"}
+version = {attr = "pyreactor_forge.__version__"}
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["pyreactor*"]
+include = ["pyreactor_forge*"]
 
 [tool.ruff]
 line-length = 100
