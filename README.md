@@ -15,6 +15,7 @@ PyReactor Forge scaffolds production-ready web applications with a Python backen
 | **Database** | PostgreSQL, MySQL, SQLite (with Alembic migrations) |
 | **Auth** | JWT (Bearer token), Session, OAuth2 |
 | **Entity generator** | Add models + CRUD API + React UI with one command |
+| **Admin seeding** | `make seed` creates the first superuser account |
 | **Docker** | Multi-stage Dockerfile + docker-compose for dev & prod |
 | **CI/CD** | GitHub Actions or GitLab CI pipelines |
 | **Code quality** | Ruff, mypy, ESLint, Vitest pre-configured |
@@ -29,6 +30,9 @@ pip install pyreactor-forge
 
 > Installs as **`pyreactor-forge`**. The terminal command is **`pyforge`** and the
 > import package is `pyreactor_forge`.
+
+> On Windows, see [Running on Windows](#-running-on-windows) for the PowerShell
+> equivalents (or run `pyforge windows`).
 
 Or from source:
 
@@ -100,7 +104,36 @@ Visit:
 - **Frontend**: http://localhost:5173
 - **API docs**: http://localhost:8000/docs
 
-### 3. Add an entity
+### 3. Create the admin user
+
+A freshly generated app has **no users** — seed the first superuser account:
+
+```bash
+make seed
+
+# or, from the backend directory
+python -m scripts.seed          # FastAPI / Flask
+python manage.py seed           # Django
+```
+
+Defaults to email `admin@example.com` / username `admin`. Override with
+`--email`, `--username`, `--password`, or the `ADMIN_EMAIL`, `ADMIN_USERNAME`
+and `ADMIN_PASSWORD` environment variables. When no password is supplied a
+random one is generated and printed once:
+
+```
+Admin user created.
+  email:    admin@example.com
+  username: admin
+  password: L-TaVKlZRUMncDuA
+This password is shown once - store it now.
+```
+
+Re-running the command resets the password and re-applies superuser rights, so
+it doubles as a password reset. Log in with the **email** (FastAPI/Flask) or the
+**username** (Django admin at `/admin/`).
+
+### 4. Add an entity
 
 ```bash
 cd my-saas
@@ -125,6 +158,81 @@ This generates:
 
 ---
 
+## 🪟 Running on Windows
+
+Everything above works on Windows — the paths and shell syntax just differ. The
+same instructions are available offline from the CLI:
+
+```powershell
+pyforge windows
+```
+
+### Install
+
+```powershell
+# Python 3.11+ from python.org or the Microsoft Store
+py -3 -m pip install --upgrade pyreactor-forge
+
+# or, isolated:
+py -3 -m pip install pipx
+pipx install pyreactor-forge
+```
+
+**`pyforge` is not recognized?** The Scripts folder isn't on `PATH`. Either call
+the module directly, or add that folder to `PATH`:
+
+```powershell
+py -3 -m pyreactor_forge.cli --help
+py -3 -c "import sysconfig; print(sysconfig.get_path('scripts'))"
+```
+
+### Generate and run an app
+
+```powershell
+pyforge new --name my-saas --backend fastapi --database postgresql
+
+# Backend
+cd my-saas\backend
+py -3 -m venv .venv
+.venv\Scripts\Activate.ps1      # cmd.exe: .venv\Scripts\activate.bat
+pip install -r requirements.txt
+copy .env.example .env
+python -m scripts.seed          # creates the admin user
+uvicorn app.main:app --reload   # Django backend: python manage.py runserver
+
+# Frontend (second terminal)
+cd my-saas\frontend
+npm install
+npm run dev
+```
+
+If PowerShell refuses to run the activation script, allow local scripts once:
+
+```powershell
+Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned
+```
+
+Or skip the local toolchain entirely and use Docker Desktop (WSL 2 backend
+recommended):
+
+```powershell
+docker compose up --build
+```
+
+### Notes
+
+- Windows PowerShell 5.1 has no `&&` chain operator — separate commands with `;`.
+- Use `py -3` rather than `python`; the Microsoft Store alias can shadow it.
+- `npm install` on deeply nested paths may need long paths enabled:
+  `git config --system core.longpaths true`.
+- CLI output is forced to UTF-8, so `pyforge info > out.txt` keeps the box
+  drawing intact instead of failing on the legacy cp1252 code page.
+- `make` isn't available by default, so run the backend and frontend commands
+  above instead of the Makefile targets (or install `make` via
+  `winget install GnuWin32.Make` / use WSL).
+
+---
+
 ## 📁 Generated Project Structure
 
 ```
@@ -141,6 +249,7 @@ my-saas/
 │   │   ├── routers/            # API route handlers
 │   │   ├── schemas/            # Pydantic schemas
 │   │   └── services/           # Business logic layer
+│   ├── scripts/                # seed.py — creates the admin user
 │   ├── tests/                  # pytest + pytest-asyncio
 │   ├── migrations/             # Alembic migrations
 │   ├── requirements.txt
@@ -181,6 +290,7 @@ my-saas/
 | `pyforge new` | Scaffold a new full-stack application |
 | `pyforge entity` | Add a new entity (model + API + UI) to an existing app |
 | `pyforge info` | Show supported technologies and commands |
+| `pyforge windows` | Show Windows install/run instructions |
 | `pyforge --version` | Display the PyReactor Forge version |
 
 ### Makefile targets (inside generated project)
@@ -190,6 +300,7 @@ my-saas/
 | `make dev` | Start backend + frontend concurrently |
 | `make install` | Install all dependencies |
 | `make migrate` | Run database migrations |
+| `make seed` | Create/update the admin superuser |
 | `make test` | Run backend + frontend tests |
 | `make lint` | Lint backend (ruff + mypy) + frontend (eslint) |
 | `make docker-up` | Start all services with Docker Compose |

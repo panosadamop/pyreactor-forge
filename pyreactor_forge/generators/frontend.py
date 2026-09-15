@@ -54,8 +54,8 @@ class FrontendGenerator:
     "test": "vitest run"
   }},
   "dependencies": {{
-    "react": "^18.3.2",
-    "react-dom": "^18.3.2",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
     "react-router-dom": "^6.23.0",
     "axios": "^1.7.2",
     "@tanstack/react-query": "^5.45.0",

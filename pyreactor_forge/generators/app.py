@@ -109,6 +109,11 @@ class AppGenerator:
     def _render_readme(self):
         name = self.name
         backend = self.config["backend"]
+        seed_cmd = (
+            "python manage.py seed"
+            if backend == "django"
+            else "python -m scripts.seed"
+        )
         frontend = self.config["frontend"]
         db = self.config["database"]
         auth = self.config["auth"]
@@ -156,6 +161,27 @@ npm install
 npm run dev
 ```
 
+### Create the admin user
+
+The database starts with no users. Seed the first superuser account:
+
+```bash
+make seed
+```
+
+Or from the backend directory:
+
+```bash
+cd backend
+{seed_cmd}
+```
+
+Defaults to email `admin@example.com` / username `admin`; override with
+`--email`, `--username`, `--password`, or the `ADMIN_EMAIL`, `ADMIN_USERNAME`
+and `ADMIN_PASSWORD` environment variables. If no password is supplied a random
+one is generated and printed once — copy it then. Re-running the command resets
+the password and re-applies superuser rights.
+
 ### Docker
 
 ```bash
@@ -172,6 +198,7 @@ docker-compose up --build
 │   │   ├── routers/  # API route handlers
 │   │   ├── schemas/  # Pydantic schemas / serializers
 │   │   └── core/     # Config, auth, database setup
+│   ├── scripts/      # seed.py — creates the admin user
 │   └── tests/        # Backend tests
 ├── frontend/         # React application
 │   ├── src/
@@ -209,9 +236,14 @@ MIT
             if backend == "django"
             else "alembic upgrade head"
         )
+        seed_cmd = (
+            "python manage.py seed"
+            if backend == "django"
+            else "python -m scripts.seed"
+        )
         return f"""# Makefile for {self.name}
 
-.PHONY: dev backend frontend install migrate test lint docker-up docker-down
+.PHONY: dev backend frontend install migrate seed test lint docker-up docker-down
 
 dev:
 \t$(MAKE) -j2 backend frontend
@@ -228,6 +260,9 @@ install:
 
 migrate:
 \tcd backend && source .venv/bin/activate && {migrate_cmd}
+
+seed:
+\tcd backend && source .venv/bin/activate && {seed_cmd}
 
 test:
 \tcd backend && source .venv/bin/activate && pytest

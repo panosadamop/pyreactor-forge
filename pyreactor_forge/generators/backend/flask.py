@@ -17,6 +17,7 @@ class FlaskGenerator:
         self._write_app()
         self._write_models()
         self._write_routes()
+        self._write_seed()
         self._write_requirements()
         self._write_env()
 
@@ -168,6 +169,96 @@ def me():
     user_id = get_jwt_identity()
     user = User.query.get_or_404(int(user_id))
     return jsonify(user.to_dict())
+''', encoding="utf-8")
+
+    def _write_seed(self):
+        scripts = self.out / "scripts"
+        scripts.mkdir()
+        (scripts / "__init__.py").write_text("", encoding="utf-8")
+        (scripts / "seed.py").write_text('''"""Seed the database with an admin user.
+
+Usage:
+    python -m scripts.seed
+    python -m scripts.seed --email admin@example.com --username admin
+
+The password comes from --password, then $ADMIN_PASSWORD. If neither is set a
+random one is generated and printed once. Re-running resets the password and
+re-applies superuser rights, so it is safe to run repeatedly.
+"""
+
+import argparse
+import os
+import secrets
+import sys
+
+from app import create_app, db
+from app.models import User
+
+MIN_PASSWORD_LENGTH = 8
+
+
+def parse_args(argv=None):
+    parser = argparse.ArgumentParser(description="Create or update the admin user.")
+    parser.add_argument("--email", default=os.environ.get("ADMIN_EMAIL", "admin@example.com"))
+    parser.add_argument("--username", default=os.environ.get("ADMIN_USERNAME", "admin"))
+    parser.add_argument("--password", default=os.environ.get("ADMIN_PASSWORD"))
+    return parser.parse_args(argv)
+
+
+def seed_admin(email: str, username: str, password: str) -> bool:
+    """Create the admin user, or promote and reset it if it already exists."""
+    app = create_app()
+
+    with app.app_context():
+        db.create_all()
+
+        user = User.query.filter_by(email=email).first()
+        created = user is None
+
+        if created:
+            user = User(email=email, username=username, full_name="Administrator")
+            db.session.add(user)
+
+        user.username = username
+        user.set_password(password)
+        user.is_active = True
+        user.is_superuser = True
+        db.session.commit()
+
+    return created
+
+
+def main(argv=None) -> int:
+    args = parse_args(argv)
+
+    password = args.password
+    generated = password is None
+    if generated:
+        password = secrets.token_urlsafe(12)
+
+    if len(password) < MIN_PASSWORD_LENGTH:
+        print(
+            f"Password must be at least {MIN_PASSWORD_LENGTH} characters.",
+            file=sys.stderr,
+        )
+        return 1
+
+    created = seed_admin(args.email, args.username, password)
+
+    print("Admin user created." if created else "Admin user updated.")
+    print(f"  email:    {args.email}")
+    print(f"  username: {args.username}")
+    if generated:
+        print(f"  password: {password}")
+        print("This password is shown once - store it now.")
+    else:
+        print("  password: (the one you supplied)")
+    print("Log in at http://localhost:5173 with the email and password.")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
 ''', encoding="utf-8")
 
     def _write_requirements(self):

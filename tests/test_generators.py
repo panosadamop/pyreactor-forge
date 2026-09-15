@@ -1,5 +1,6 @@
 """Tests for PyReactor Forge generators."""
 
+import ast
 import json
 import shutil
 import tempfile
@@ -122,6 +123,51 @@ class TestAppGenerator:
         assert (backend / "wsgi.py").exists()
 
 
+    @pytest.mark.parametrize("frontend", ["react", "react-ts"])
+    def test_frontend_package_json_is_valid(self, temp_dir, frontend):
+        config = {**BASE_CONFIG, "frontend": frontend, "output_dir": str(temp_dir)}
+        AppGenerator(config).generate()
+
+        pkg_path = temp_dir / "test-app" / "frontend" / "package.json"
+        with open(pkg_path, encoding="utf-8") as f:
+            pkg = json.load(f)
+
+        # 18.3.1 is the last published 18.x release; a higher pin makes
+        # npm install fail with ETARGET before it fetches anything.
+        assert pkg["dependencies"]["react"] == "^18.3.1"
+        assert pkg["dependencies"]["react-dom"] == "^18.3.1"
+        assert ("typescript" in pkg["devDependencies"]) == (frontend == "react-ts")
+
+
+    @pytest.mark.parametrize(
+        "backend,seed_path,seed_cmd",
+        [
+            ("fastapi", "backend/scripts/seed.py", "python -m scripts.seed"),
+            ("flask", "backend/scripts/seed.py", "python -m scripts.seed"),
+            ("django", "backend/api/management/commands/seed.py", "python manage.py seed"),
+        ],
+    )
+    def test_seed_command_generated(self, temp_dir, backend, seed_path, seed_cmd):
+        config = {**BASE_CONFIG, "backend": backend, "output_dir": str(temp_dir)}
+        AppGenerator(config).generate()
+
+        project = temp_dir / "test-app"
+        seed = project / seed_path
+        assert seed.exists()
+
+        source = seed.read_text(encoding="utf-8")
+        ast.parse(source)  # the generated script must be valid Python
+        assert "is_superuser" in source
+        assert "ADMIN_PASSWORD" in source
+
+        makefile = (project / "Makefile").read_text(encoding="utf-8")
+        assert f"seed:\n\tcd backend && source .venv/bin/activate && {seed_cmd}" in makefile
+
+        readme = (project / "README.md").read_text(encoding="utf-8")
+        assert "### Create the admin user" in readme
+        assert seed_cmd in readme
+
+
 class TestEntityGenerator:
     def _generate_base_app(self, temp_dir):
         config = {**BASE_CONFIG, "output_dir": str(temp_dir)}
@@ -180,6 +226,13 @@ class TestCLI:
         assert result.exit_code == 0
         assert "FastAPI" in result.output
         assert "Django" in result.output
+
+    def test_windows_command(self):
+        runner = CliRunner()
+        result = runner.invoke(cli, ["windows"])
+        assert result.exit_code == 0
+        assert ".venv\\Scripts\\Activate.ps1" in result.output
+        assert "py -3 -m venv .venv" in result.output
 
     def test_new_command(self, temp_dir):
         runner = CliRunner()

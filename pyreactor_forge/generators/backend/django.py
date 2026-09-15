@@ -21,6 +21,7 @@ class DjangoGenerator:
         self._write_manage()
         self._write_settings()
         self._write_app()
+        self._write_seed()
         self._write_requirements()
         self._write_env()
 
@@ -90,6 +91,23 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = "{self.slug}.urls"
 
+TEMPLATES = [
+    {{
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        "DIRS": [],
+        "APP_DIRS": True,
+        "OPTIONS": {{
+            "context_processors": [
+                "django.template.context_processors.request",
+                "django.contrib.auth.context_processors.auth",
+                "django.contrib.messages.context_processors.messages",
+            ],
+        }},
+    }},
+]
+
+WSGI_APPLICATION = "{self.slug}.wsgi.application"
+
 DATABASES = {{
     "default": {{
         "ENGINE": "{db_engine}",
@@ -138,6 +156,17 @@ urlpatterns = [
 ]
 ''', encoding="utf-8")
 
+        (self.out / self.slug / "wsgi.py").write_text(f'''"""WSGI entry point for {self.name}."""
+
+import os
+
+from django.core.wsgi import get_wsgi_application
+
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "{self.slug}.settings")
+
+application = get_wsgi_application()
+''', encoding="utf-8")
+
     def _write_app(self):
         (self.out / "api" / "__init__.py").write_text("", encoding="utf-8")
         (self.out / "api" / "v1" / "__init__.py").write_text("", encoding="utf-8")
@@ -176,6 +205,78 @@ class HealthView(APIView):
 
     def get(self, request):
         return Response({"status": "ok"})
+''', encoding="utf-8")
+
+    def _write_seed(self):
+        commands = self.out / "api" / "management" / "commands"
+        commands.mkdir(parents=True)
+        (self.out / "api" / "management" / "__init__.py").write_text("", encoding="utf-8")
+        (commands / "__init__.py").write_text("", encoding="utf-8")
+        (commands / "seed.py").write_text('''"""Create or update the admin superuser.
+
+Usage:
+    python manage.py seed
+    python manage.py seed --email admin@example.com --username admin
+
+The password comes from --password, then $ADMIN_PASSWORD. If neither is set a
+random one is generated and printed once. Re-running resets the password and
+re-applies superuser rights, so it is safe to run repeatedly.
+"""
+
+import os
+import secrets
+
+from django.contrib.auth import get_user_model
+from django.core.management.base import BaseCommand, CommandError
+
+MIN_PASSWORD_LENGTH = 8
+
+User = get_user_model()
+
+
+class Command(BaseCommand):
+    help = "Create or update the admin superuser."
+
+    def add_arguments(self, parser):
+        parser.add_argument("--email", default=os.environ.get("ADMIN_EMAIL", "admin@example.com"))
+        parser.add_argument("--username", default=os.environ.get("ADMIN_USERNAME", "admin"))
+        parser.add_argument("--password", default=os.environ.get("ADMIN_PASSWORD"))
+
+    def handle(self, *args, **options):
+        password = options["password"]
+        generated = password is None
+        if generated:
+            password = secrets.token_urlsafe(12)
+
+        if len(password) < MIN_PASSWORD_LENGTH:
+            raise CommandError(
+                f"Password must be at least {MIN_PASSWORD_LENGTH} characters."
+            )
+
+        username = options["username"]
+        email = options["email"]
+
+        user, created = User.objects.get_or_create(username=username)
+        user.email = email
+        user.is_active = True
+        user.is_staff = True
+        user.is_superuser = True
+        user.set_password(password)
+        user.save()
+
+        self.stdout.write(
+            self.style.SUCCESS(
+                "Admin user created." if created else "Admin user updated."
+            )
+        )
+        self.stdout.write(f"  email:    {email}")
+        self.stdout.write(f"  username: {username}")
+        if generated:
+            self.stdout.write(f"  password: {password}")
+            self.stdout.write("This password is shown once - store it now.")
+        else:
+            self.stdout.write("  password: (the one you supplied)")
+        self.stdout.write("Log in at http://localhost:8000/admin/ with the username.")
 ''', encoding="utf-8")
 
     def _write_requirements(self):

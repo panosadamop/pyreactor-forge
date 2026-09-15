@@ -223,9 +223,64 @@ def info():
             "[bold cyan]Commands:[/bold cyan]\n"
             "  • [yellow]pyforge new[/yellow]     — Scaffold a new application\n"
             "  • [yellow]pyforge entity[/yellow]  — Add a new entity to an existing app\n"
-            "  • [yellow]pyforge info[/yellow]    — Show this information",
+            "  • [yellow]pyforge info[/yellow]    — Show this information\n"
+            "  • [yellow]pyforge windows[/yellow] — How to install and run on Windows",
             title="ℹ️  About PyReactor Forge",
             border_style="blue",
+        )
+    )
+
+
+@cli.command()
+def windows():
+    """Show how to install and run PyReactor Forge (and generated apps) on Windows."""
+    print_banner()
+    console.print(
+        Panel(
+            "[bold]1. Install[/bold]\n"
+            "  [dim]# Python 3.11+ from python.org or the Microsoft Store[/dim]\n"
+            "  [cyan]py -3 -m pip install --upgrade pyreactor-forge[/cyan]\n"
+            "  [dim]# or, isolated:[/dim]\n"
+            "  [cyan]py -3 -m pip install pipx; pipx install pyreactor-forge[/cyan]\n\n"
+            "[bold]2. If 'pyforge' is not recognized[/bold]\n"
+            "  [dim]The Scripts folder is not on PATH. Either call the module directly:[/dim]\n"
+            "  [cyan]py -3 -m pyreactor_forge.cli --help[/cyan]\n"
+            "  [dim]or add the Scripts folder to PATH — find it with:[/dim]\n"
+            "  [cyan]py -3 -c \"import sysconfig; print(sysconfig.get_path('scripts'))\"[/cyan]\n\n"
+            "[bold]3. Scaffold an app[/bold]\n"
+            "  [cyan]pyforge new --name myapp --backend fastapi --database sqlite[/cyan]\n"
+            "  [dim]Paths with spaces need quotes:[/dim]\n"
+            "  [cyan]pyforge new -o \"C:\\My Projects\"[/cyan]\n\n"
+            "[bold]4. Run the generated backend (PowerShell)[/bold]\n"
+            "  [cyan]cd myapp\\backend[/cyan]\n"
+            "  [cyan]py -3 -m venv .venv[/cyan]\n"
+            "  [cyan].venv\\Scripts\\Activate.ps1[/cyan]\n"
+            "  [cyan]pip install -r requirements.txt[/cyan]\n"
+            "  [cyan]copy .env.example .env[/cyan]\n"
+            "  [cyan]python -m scripts.seed[/cyan]   [dim](creates the admin user)[/dim]\n"
+            "  [cyan]uvicorn app.main:app --reload[/cyan]\n"
+            "  [dim](Django backend: python manage.py runserver)[/dim]\n\n"
+            "  [dim]cmd.exe instead of PowerShell:[/dim]\n"
+            "  [cyan].venv\\Scripts\\activate.bat[/cyan]\n"
+            "  [dim]Activation blocked? Run once:[/dim]\n"
+            "  [cyan]Set-ExecutionPolicy -Scope CurrentUser"
+            " -ExecutionPolicy RemoteSigned[/cyan]\n\n"
+            "[bold]5. Run the frontend (second terminal)[/bold]\n"
+            "  [cyan]cd myapp\\frontend[/cyan]\n"
+            "  [cyan]npm install[/cyan]\n"
+            "  [cyan]npm run dev[/cyan]\n"
+            "  [dim]npm needs Node.js 18+ (nodejs.org or winget install OpenJS.NodeJS.LTS).[/dim]\n"
+            "  [dim]If npm install fails on deep paths, enable long paths:[/dim]\n"
+            "  [cyan]git config --system core.longpaths true[/cyan]\n\n"
+            "[bold]6. Or use Docker Desktop[/bold]\n"
+            "  [cyan]docker compose up --build[/cyan]   [dim](WSL 2 backend recommended)[/dim]\n\n"
+            "[bold]Shell notes[/bold]\n"
+            "  • Windows PowerShell 5.1 has no [cyan]&&[/cyan] — chain with [cyan];[/cyan].\n"
+            "  • Use [cyan]py -3[/cyan] rather than [cyan]python[/cyan]"
+            "; the Store alias can shadow it.\n"
+            "  • Output is UTF-8, so redirecting to a file keeps the box drawing.",
+            title="🪟 PyReactor Forge on Windows",
+            border_style="cyan",
         )
     )
 
