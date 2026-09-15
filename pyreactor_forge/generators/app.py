@@ -182,6 +182,19 @@ and `ADMIN_PASSWORD` environment variables. If no password is supplied a random
 one is generated and printed once — copy it then. Re-running the command resets
 the password and re-applies superuser rights.
 
+### Entities
+
+```bash
+pyforge entity                   # add one interactively
+pyforge import-pydl model.pydl   # add/update many from a PyDL (JDL) file
+pyforge entity-list              # what this project defines
+pyforge entity-edit -n Product   # change fields and regenerate
+pyforge entity-remove -n Product # delete it and unregister it safely
+```
+
+Entities are tracked in `.pyforge.json`; edits and removals snapshot the files
+they touch into `.pyforge-backups/` first.
+
 ### Docker
 
 ```bash
@@ -313,4 +326,7 @@ Thumbs.db
 
 # Docker
 .docker/
+
+# PyReactor Forge
+.pyforge-backups/
 """

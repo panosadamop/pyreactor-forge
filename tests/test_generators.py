@@ -205,8 +205,8 @@ class TestEntityGenerator:
         fields = [{"name": "name", "type": "string", "required": True}]
         EntityGenerator("Category", fields, app_config, project).generate()
 
-        router = (project / "backend" / "app" / "routers" / "categorys.py").read_text()
-        assert "list_categorys" in router
+        router = (project / "backend" / "app" / "routers" / "categories.py").read_text()
+        assert "list_categories" in router
         assert "create_category" in router
         assert "get_category" in router
         assert "update_category" in router
